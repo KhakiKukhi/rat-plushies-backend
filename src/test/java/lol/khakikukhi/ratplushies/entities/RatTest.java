@@ -1,13 +1,12 @@
 package lol.khakikukhi.ratplushies.entities;
 
-import jakarta.transaction.Transactional;
 import lol.khakikukhi.ratplushies.repositories.RatRepository;
 import lol.khakikukhi.ratplushies.repositories.OwnerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,9 +31,9 @@ class RatTest {
         rat.setOwner(owner);
 
         ratRepository.save(rat);
-        assertNotNull(rat.getRatId());
-        assertTrue(rat.getRatId().startsWith("RAT_"));
-        assertEquals(36, rat.getRatId().length());
+        assertNotNull(rat.getId());
+        assertTrue(rat.getId().startsWith("RAT_"));
+        assertEquals(36, rat.getId().length());
     }
 
     @Test
@@ -108,7 +107,7 @@ class RatTest {
 
         ratRepository.save(rat);
 
-        Optional<Rat> retrieved = ratRepository.findById(rat.getRatId());
+        Optional<Rat> retrieved = ratRepository.findById(rat.getId());
 
         assertTrue(retrieved.isPresent());
         assertEquals("Whiskers", retrieved.get().getName());
@@ -128,13 +127,26 @@ class RatTest {
         ratRepository.save(parent);
         ratRepository.save(child);
 
-        Optional<Rat> loadedParent = ratRepository.findById(parent.getRatId());
-        Optional<Rat> loadedChild = ratRepository.findById(child.getRatId());
+        Optional<Rat> loadedParent = ratRepository.findById(parent.getId());
+        Optional<Rat> loadedChild = ratRepository.findById(child.getId());
 
         assertTrue(loadedParent.isPresent());
         assertTrue(loadedChild.isPresent());
 
         assertTrue(loadedParent.get().getChildren().contains(loadedChild.get()));
         assertTrue(loadedChild.get().getParents().contains(loadedParent.get()));
+    }
+
+    @Test
+    void ownerId_shouldAutoGenerateOnPersist() {
+        Rat rat = new Rat();
+        rat.setName("Chives");
+
+        assertNull(rat.getId());
+
+        Rat saved = ratRepository.save(rat);
+
+        assertNotNull(saved.getId());
+        assertTrue(saved.getId().matches("^RAT_[0-9a-fA-F]{32}$"), "ID should be 'RAT_' + 32 hex chars");
     }
 }

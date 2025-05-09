@@ -9,25 +9,32 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "rats")
-public class Owner {
+public class Owner{
     @PrePersist
     public void generateId() {
-        if (this.ownerId == null) {
-            this.ownerId = "USR_" + UUID.randomUUID().toString().replace("-", "");
+        if (this.id == null) {
+            this.id = "USR_" + UUID.randomUUID().toString().replace("-", "");
         }
     }
 
     @Id
-    @Column(name = "ownerId", length = 36, nullable = false, updatable = false)
-    public String ownerId;
+    @Column(length = 36, nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
+    public String id;
 
     @Column(nullable = false, updatable = true)
     private String username;
 
     @Column(nullable = false, updatable = true)
     private String password;
+
+    @Column(nullable = true, updatable = true)
+    private String profilePicture;
 
     // Optional
     @Column(nullable = true, updatable = true)
@@ -76,17 +83,5 @@ public class Owner {
 
     List<Rat> getRatsInternal() {
         return rats;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Owner rat)) return false;
-        return ownerId != null && ownerId.equals(rat.getOwnerId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 }

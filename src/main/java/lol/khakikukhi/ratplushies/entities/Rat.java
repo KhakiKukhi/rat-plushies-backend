@@ -2,37 +2,46 @@ package lol.khakikukhi.ratplushies.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"owner", "partners", "parents", "children"})
-public class Rat {
+public class Rat{
     @PrePersist
     public void generateId() {
-        if (this.ratId == null) {
-            this.ratId = "RAT_" + UUID.randomUUID().toString().replace("-", "");
+        if (this.id == null) {
+            this.id = "RAT_" + UUID.randomUUID().toString().replace("-", "");
         }
     }
 
     @Id
     @Column(length = 36, nullable = false, updatable = false)
-    private String ratId;
+    @EqualsAndHashCode.Include
+    private String id;
 
     @Column(nullable = false, updatable = true)
     private String name; // TODO: Should this be unique?
 
-    @ManyToOne
-    @JoinColumn(
-            name = "user_id",
-            foreignKey = @ForeignKey(name = "fk_rat_owner", foreignKeyDefinition = "FOREIGN KEY (user_id) REFERENCES owner(\"ownerId\") ON DELETE SET NULL"
-            )
-    )
+    @ManyToOne(optional = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @JoinColumn(name = "user_id", nullable = true)
     @Setter(AccessLevel.NONE)
     private Owner owner;
+
+    @Column(nullable = true, updatable = true)
+    private String profilePicture;
+
+    @Column(nullable = true, updatable = true)
+    private String bio;
 
     @ManyToMany
     @JoinTable(
@@ -136,17 +145,5 @@ public class Rat {
 
     List<Rat> internalGetChildren() {
         return children;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Rat rat)) return false;
-        return ratId != null && ratId.equals(rat.getRatId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 }

@@ -1,12 +1,9 @@
-package lol.khakikukhi.ratplushies;
+package lol.khakikukhi.ratplushies.entities;
 
-import jakarta.transaction.Transactional;
-import lol.khakikukhi.ratplushies.entities.Owner;
 import lol.khakikukhi.ratplushies.repositories.OwnerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -28,8 +25,8 @@ class OwnerTest {
 
         Owner saved = ownerRepository.save(owner);
 
-        assertNotNull(saved.getOwnerId());
-        assertTrue(saved.getOwnerId().startsWith("USR"));
+        assertNotNull(saved.getId());
+        assertTrue(saved.getId().startsWith("USR"));
         assertEquals("khaki", saved.getUsername());
         assertEquals("squeakyRatLover42", saved.getPassword());
     }
@@ -45,7 +42,7 @@ class OwnerTest {
 
         Owner saved = ownerRepository.save(owner);
 
-        Optional<Owner> loaded = ownerRepository.findById(saved.getOwnerId());
+        Optional<Owner> loaded = ownerRepository.findById(saved.getId());
         assertTrue(loaded.isPresent());
 
         Owner fetched = loaded.get();
@@ -61,12 +58,12 @@ class OwnerTest {
         owner.setUsername("autoID");
         owner.setPassword("secure");
 
-        assertNull(owner.getOwnerId());
+        assertNull(owner.getId());
 
         Owner saved = ownerRepository.save(owner);
 
-        assertNotNull(saved.getOwnerId());
-        assertTrue(saved.getOwnerId().matches("^USR[0-9a-fA-F]{32}$"), "ID should be 'USR' + 32 hex chars");
+        assertNotNull(saved.getId());
+        assertTrue(saved.getId().matches("^USR_[0-9a-fA-F]{32}$"), "ID should be 'USR_' + 32 hex chars");
     }
 
     @Test
@@ -84,4 +81,5 @@ class OwnerTest {
 
         assertThrows(Exception.class, () -> ownerRepository.saveAndFlush(owner));
     }
+
 }

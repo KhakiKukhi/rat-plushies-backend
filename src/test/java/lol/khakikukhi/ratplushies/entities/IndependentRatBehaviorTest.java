@@ -5,8 +5,6 @@ import lol.khakikukhi.ratplushies.repositories.RatRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 
@@ -29,7 +27,7 @@ public class IndependentRatBehaviorTest {
         ratRepository.save(rat);
 
         // Retrieve the rat and verify that it persists and has no owner.
-        Optional<Rat> retrieved = ratRepository.findById(rat.getRatId());
+        Optional<Rat> retrieved = ratRepository.findById(rat.getId());
         assertTrue(retrieved.isPresent(), "Rat should be persisted independently.");
         assertNull(retrieved.get().getOwner(), "Rat created without owner should have a null owner.");
     }
@@ -51,16 +49,16 @@ public class IndependentRatBehaviorTest {
         ratRepository.save(rat);
 
         // Verify assignment is successful.
-        Rat assigned = ratRepository.findById(rat.getRatId()).orElseThrow();
+        Rat assigned = ratRepository.findById(rat.getId()).orElseThrow();
         assertNotNull(assigned.getOwner(), "Rat should have an owner after assignment.");
-        assertEquals(owner.getOwnerId(), assigned.getOwner().getOwnerId(), "Owner id should match.");
+        assertEquals(owner.getId(), assigned.getOwner().getId(), "Owner id should match.");
 
         // Delete the owner. In our mapping, on owner deletion, rat's owner reference becomes null.
         owner.clearAllRats();
         ownerRepository.delete(owner);
 
         // The rat should still exist and not be deleted.
-        Rat retrieved = ratRepository.findById(rat.getRatId()).orElseThrow();
+        Rat retrieved = ratRepository.findById(rat.getId()).orElseThrow();
         assertNotNull(retrieved, "Rat should still exist in the repository.");
         assertNull(retrieved.getOwner(), "Rat's owner should be null after its owner is deleted.");
     }
@@ -80,8 +78,8 @@ public class IndependentRatBehaviorTest {
         // Assign the rat to the first owner.
         rat.setOwner(firstOwner);
         ratRepository.save(rat);
-        Rat afterFirstAssign = ratRepository.findById(rat.getRatId()).orElseThrow();
-        assertEquals(firstOwner.getOwnerId(), afterFirstAssign.getOwner().getOwnerId(),
+        Rat afterFirstAssign = ratRepository.findById(rat.getId()).orElseThrow();
+        assertEquals(firstOwner.getId(), afterFirstAssign.getOwner().getId(),
                      "Rat should be assigned to first owner.");
 
         // Now, remove the association by unassigning the owner.
@@ -89,11 +87,11 @@ public class IndependentRatBehaviorTest {
         ownerRepository.save(firstOwner);
         ratRepository.save(rat);
 
-        Rat afterUnassign = ratRepository.findById(rat.getRatId()).orElseThrow();
+        Rat afterUnassign = ratRepository.findById(rat.getId()).orElseThrow();
         assertNull(afterUnassign.getOwner(), "Rat should have a null owner after unassignment.");
 
         // Finally, confirm the rat still exists independently even though owner assignment changed.
-        assertTrue(ratRepository.findById(rat.getRatId()).isPresent(),
+        assertTrue(ratRepository.findById(rat.getId()).isPresent(),
                    "Rat should persist regardless of owner assignments.");
     }
 }
