@@ -134,6 +134,47 @@ class ProfilePicturesServiceIntegrationTest {
         assertTrue(diff < tolerance, "Saved image colour should be within tolerance");
     }
 
+    @Test
+    void uploadRatProfilePicture_notOwner() throws IOException {
+        // given
+        Rat rat = new Rat();
+        rat.setName("Remy");
+        ratRepo.save(rat);
+
+        Owner owner = new Owner();
+        owner.setUsername("bob");
+        owner.setPasswordHash("pw");
+        ownerRepo.save(owner);
+
+        // generate a random hex colour
+        int r = (int) (Math.random() * 256);
+        int g = (int) (Math.random() * 256);
+        int b = (int) (Math.random() * 256);
+        int rgb = (r << 16) | (g << 8) | b;
+
+        // build 8x8 image with that colour
+        BufferedImage img = new BufferedImage(8, 8, BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < 8; y++) {
+            for (int x = 0; x < 8; x++) {
+                img.setRGB(x, y, rgb);
+            }
+        }
+
+        // save to byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(img, "jpg", baos);
+
+        var file = new MockMultipartFile(
+                "file",
+                "remy.jpg",
+                "image/jpeg",
+                baos.toByteArray()
+        );
+
+        // when
+        assertThrows(IllegalArgumentException.class, () -> service.uploadProfilePictureRat(owner.getId(), rat.getId(), file));
+    }
+
 
     @Test
     void emptyFile_throwsIllegalArgument() {
