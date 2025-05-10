@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.lang.reflect.Field;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +22,7 @@ class RatTest {
     void testIdIsGeneratedOnPersist() {
         Owner owner = new Owner();
         owner.setUsername("testuser");
-        owner.setPassword("secret123");
+        owner.setPasswordHash("secret123");
         ownerRepository.save(owner);
 
         Rat rat = new Rat();
@@ -98,7 +97,7 @@ class RatTest {
     void testRatPersistence() {
         Owner owner = new Owner();
         owner.setUsername("testuser");
-        owner.setPassword("secret123");
+        owner.setPasswordHash("secret123");
         ownerRepository.save(owner);
 
         Rat rat = new Rat();

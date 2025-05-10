@@ -34,8 +34,8 @@ public class ProfilePicturesService {
     private final OwnerRepository ownerRepository;
     private final RatRepository ratRepository;
 
-    public void uploadProfilePictureOwner(String id, MultipartFile file) throws IOException {
-        Owner owner = ownerRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Owner not found"));
+    public void uploadProfilePictureOwner(String userId, MultipartFile file) throws IOException {
+        Owner owner = ownerRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Owner not found"));
         byte[] imageData = fileCheck(file);
         String filename = owner.getId() + getExtension(file.getOriginalFilename());
         saveFile(filename, imageData);
@@ -43,13 +43,18 @@ public class ProfilePicturesService {
         ownerRepository.save(owner);
     }
 
-    public void uploadProfilePictureRat(String id, MultipartFile file) throws IOException {
-        Rat rat = ratRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Rat not found"));
-        byte[] imageData = fileCheck(file);
-        String filename = rat.getId() + getExtension(file.getOriginalFilename());
-        saveFile(filename, imageData);
-        rat.setProfilePicture(filename);
-        ratRepository.save(rat);
+    public void uploadProfilePictureRat(String userId, String ratId, MultipartFile file) throws IOException {
+        Owner owner = ownerRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("Owner not found!"));
+        Rat rat = ratRepository.findById(ratId).orElseThrow(() -> new EntityNotFoundException("Rat not found!"));
+        if (owner.ownsRat(rat)) {
+            byte[] imageData = fileCheck(file);
+            String filename = rat.getId() + getExtension(file.getOriginalFilename());
+            saveFile(filename, imageData);
+            rat.setProfilePicture(filename);
+            ratRepository.save(rat);
+        } else {
+            throw new IllegalArgumentException("Rat not owned by this owner!");
+        }
     }
 
     private byte[] fileCheck(MultipartFile file) throws IOException {

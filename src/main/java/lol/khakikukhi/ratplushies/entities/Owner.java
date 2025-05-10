@@ -27,11 +27,17 @@ public class Owner{
     @EqualsAndHashCode.Include
     public String id;
 
-    @Column(nullable = false, updatable = true)
+    @Column(unique = true, nullable = false, updatable = true)
     private String username;
 
     @Column(nullable = false, updatable = true)
-    private String password;
+    private String passwordHash;
+
+    @Column(nullable = false, updatable = true)
+    private boolean isAdmin = false;
+
+    @Column(nullable = false, updatable = true)
+    private boolean enabled = true;
 
     @Column(nullable = true, updatable = true)
     private String profilePicture;
@@ -71,6 +77,10 @@ public class Owner{
 
     public List<Rat> getRats() {
         return List.copyOf(rats);
+    }
+
+    public boolean ownsRat(Rat rat) {
+        return rats.contains(rat);
     }
 
     void internalAddRat(Rat rat) {

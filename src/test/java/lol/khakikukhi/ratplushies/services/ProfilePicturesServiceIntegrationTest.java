@@ -5,7 +5,6 @@ import lol.khakikukhi.ratplushies.entities.Owner;
 import lol.khakikukhi.ratplushies.entities.Rat;
 import lol.khakikukhi.ratplushies.repositories.OwnerRepository;
 import lol.khakikukhi.ratplushies.repositories.RatRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.ImageIO;
@@ -54,7 +51,7 @@ class ProfilePicturesServiceIntegrationTest {
         // given
         Owner owner = new Owner();
         owner.setUsername("alice");
-        owner.setPassword("secret");
+        owner.setPasswordHash("secret");
         ownerRepo.save(owner);
 
         // build a tiny 10×10 PNG in memory
@@ -86,6 +83,12 @@ class ProfilePicturesServiceIntegrationTest {
         rat.setName("Remy");
         ratRepo.save(rat);
 
+        Owner owner = new Owner();
+        owner.setUsername("bob");
+        owner.setPasswordHash("pw");
+        owner.addRat(rat);
+        ownerRepo.save(owner);
+
         // generate a random hex colour
         int r = (int) (Math.random() * 256);
         int g = (int) (Math.random() * 256);
@@ -112,7 +115,7 @@ class ProfilePicturesServiceIntegrationTest {
         );
 
         // when
-        service.uploadProfilePictureRat(rat.getId(), file);
+        service.uploadProfilePictureRat(owner.getId(), rat.getId(), file);
 
         // then
         Rat updated = ratRepo.findById(rat.getId()).orElseThrow();
@@ -136,7 +139,7 @@ class ProfilePicturesServiceIntegrationTest {
     void emptyFile_throwsIllegalArgument() {
         Owner owner = new Owner();
         owner.setUsername("bob");
-        owner.setPassword("pw");
+        owner.setPasswordHash("pw");
         ownerRepo.save(owner);
 
         var emptyFile = new MockMultipartFile("file", "empty.png", "image/png", new byte[0]);
@@ -150,7 +153,7 @@ class ProfilePicturesServiceIntegrationTest {
     void invalidContentType_throwsIllegalArgument() {
         Owner owner = new Owner();
         owner.setUsername("charlie");
-        owner.setPassword("pw");
+        owner.setPasswordHash("pw");
         ownerRepo.save(owner);
 
         var txtFile = new MockMultipartFile("file", "foo.txt", "text/plain", "hello".getBytes());
@@ -163,7 +166,7 @@ class ProfilePicturesServiceIntegrationTest {
     void tooLargeImage_throwsIllegalArgument() throws IOException {
         Owner owner = new Owner();
         owner.setUsername("dan");
-        owner.setPassword("pw");
+        owner.setPasswordHash("pw");
         ownerRepo.save(owner);
 
         // 2000×200 px image

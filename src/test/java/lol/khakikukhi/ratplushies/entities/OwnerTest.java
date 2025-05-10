@@ -21,21 +21,21 @@ class OwnerTest {
     void saveOwner_withMinimalValidData_shouldPersist() {
         Owner owner = new Owner();
         owner.setUsername("khaki");
-        owner.setPassword("squeakyRatLover42");
+        owner.setPasswordHash("squeakyRatLover42");
 
         Owner saved = ownerRepository.save(owner);
 
         assertNotNull(saved.getId());
         assertTrue(saved.getId().startsWith("USR"));
         assertEquals("khaki", saved.getUsername());
-        assertEquals("squeakyRatLover42", saved.getPassword());
+        assertEquals("squeakyRatLover42", saved.getPasswordHash());
     }
 
     @Test
     void saveOwner_withAllFieldsSet_shouldPersistAndRetrieveAccurately() {
         Owner owner = new Owner();
         owner.setUsername("cheeseFan");
-        owner.setPassword("miceAreNice");
+        owner.setPasswordHash("miceAreNice");
         owner.setEmailAddress("cheese@example.com");
         owner.setBirthday(Timestamp.from(Instant.parse("1990-05-15T00:00:00Z")));
         owner.setBio("I collect plush rats and actual ones too.");
@@ -56,7 +56,7 @@ class OwnerTest {
     void ownerId_shouldAutoGenerateOnPersist() {
         Owner owner = new Owner();
         owner.setUsername("autoID");
-        owner.setPassword("secure");
+        owner.setPasswordHash("secure");
 
         assertNull(owner.getId());
 
@@ -69,7 +69,7 @@ class OwnerTest {
     @Test
     void saveOwner_missingUsername_shouldThrowException() {
         Owner owner = new Owner();
-        owner.setPassword("somePass");
+        owner.setPasswordHash("somePass");
 
         assertThrows(Exception.class, () -> ownerRepository.saveAndFlush(owner));
     }

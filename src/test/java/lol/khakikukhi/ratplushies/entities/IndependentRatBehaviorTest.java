@@ -42,7 +42,7 @@ public class IndependentRatBehaviorTest {
         // Later, assign an owner to this existing rat.
         Owner owner = new Owner();
         owner.setUsername("tempOwner");
-        owner.setPassword("tempPass");
+        owner.setPasswordHash("tempPass");
         ownerRepository.save(owner);
 
         rat.setOwner(owner);
@@ -72,7 +72,7 @@ public class IndependentRatBehaviorTest {
 
         Owner firstOwner = new Owner();
         firstOwner.setUsername("firstOwner");
-        firstOwner.setPassword("pass1");
+        firstOwner.setPasswordHash("pass1");
         ownerRepository.save(firstOwner);
 
         // Assign the rat to the first owner.

@@ -8,6 +8,7 @@ import java.util.List;
 public class OwnerDto {
     private String ownerId;
     private String username;
+    private String profilePicture;
     private String emailAddress;
     private String bio;
     private String birthday;

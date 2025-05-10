@@ -1,5 +1,6 @@
 package lol.khakikukhi.ratplushies.controllers;
 
+import jakarta.servlet.http.HttpSession;
 import lol.khakikukhi.ratplushies.services.ProfilePicturesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,27 +28,21 @@ public class ProfilePictureController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("File processing error: " + e.getMessage());
         }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Validation error: " + e.getMessage());
-        }
     }
 
-    @PostMapping(path = "/rats/{id}/upload-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadProfilePictureRat (@PathVariable String id, @RequestParam("file")MultipartFile file) {
+    @PostMapping(path = "/rats/{ratId}/upload-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadProfilePictureRat (@PathVariable String ratId, @RequestParam("file")MultipartFile file, HttpSession session) {
         try {
-            profilePicturesService.uploadProfilePictureRat(id, file);
+
+            String userId  = session.getAttribute("userId").toString();
+            profilePicturesService.uploadProfilePictureRat(userId, ratId, file);
             return ResponseEntity.ok("Profile picture uploaded!");
+
+
         } catch (IOException e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("File processing error: " + e.getMessage());
-        }
-        catch (IllegalArgumentException e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Validation error: " + e.getMessage());
         }
     }
 }

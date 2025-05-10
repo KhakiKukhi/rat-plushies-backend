@@ -40,7 +40,7 @@ public class OwnerRatRelationTest {
 
         Owner owner = new Owner();
         owner.setUsername("scruffmaster");
-        owner.setPassword("pw");
+        owner.setPasswordHash("pw");
         ownerRepository.save(owner);
 
         rat.setOwner(owner);
@@ -54,12 +54,12 @@ public class OwnerRatRelationTest {
     void ratOwnershipCanBeSwitched() {
         Owner originalOwner = new Owner();
         originalOwner.setUsername("old");
-        originalOwner.setPassword("123");
+        originalOwner.setPasswordHash("123");
         ownerRepository.save(originalOwner);
 
         Owner newOwner = new Owner();
         newOwner.setUsername("new");
-        newOwner.setPassword("456");
+        newOwner.setPasswordHash("456");
         ownerRepository.save(newOwner);
 
         Rat rat = new Rat();
@@ -79,7 +79,7 @@ public class OwnerRatRelationTest {
     void ratPersistsAfterOwnerDeleted() {
         Owner owner = new Owner();
         owner.setUsername("ghost");
-        owner.setPassword("pw");
+        owner.setPasswordHash("pw");
         ownerRepository.save(owner);
 
         Rat rat = new Rat();
@@ -98,7 +98,7 @@ public class OwnerRatRelationTest {
     void ownerSeesAllOwnedRats() {
         Owner owner = new Owner();
         owner.setUsername("ratcollector");
-        owner.setPassword("secure");
+        owner.setPasswordHash("secure");
         ownerRepository.save(owner);
 
         Rat r1 = new Rat();
@@ -125,12 +125,12 @@ public class OwnerRatRelationTest {
         // Create Owner A
         Owner ownerA = new Owner();
         ownerA.setUsername("first");
-        ownerA.setPassword("a123");
+        ownerA.setPasswordHash("a123");
 
         // Create Owner B
         Owner ownerB = new Owner();
         ownerB.setUsername("second");
-        ownerB.setPassword("b123");
+        ownerB.setPasswordHash("b123");
 
         ownerRepository.save(ownerA);
         ownerRepository.save(ownerB);
@@ -175,7 +175,7 @@ public class OwnerRatRelationTest {
 
         Owner owner = new Owner();
         owner.setUsername("lonely_owner");
-        owner.setPassword("<PASSWORD>");
+        owner.setPasswordHash("<PASSWORD>");
         owner.addRat(rat); // links them
         ownerRepository.save(owner);
 
@@ -192,7 +192,7 @@ public class OwnerRatRelationTest {
         // Setup: Owner with a rat
         Owner owner = new Owner();
         owner.setUsername("ratkeeper");
-        owner.setPassword("123");
+        owner.setPasswordHash("123");
         ownerRepository.save(owner);
 
         Rat rat = new Rat();
