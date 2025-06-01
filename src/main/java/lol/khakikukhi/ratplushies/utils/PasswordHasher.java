@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.utilities;
+package lol.khakikukhi.ratplushies.utils;
 
 import com.password4j.Argon2Function;
 import com.password4j.Hash;

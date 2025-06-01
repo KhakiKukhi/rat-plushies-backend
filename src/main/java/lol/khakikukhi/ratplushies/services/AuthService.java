@@ -6,7 +6,7 @@ import lol.khakikukhi.ratplushies.DTOs.LoginRequest;
 import lol.khakikukhi.ratplushies.entities.Owner;
 import lol.khakikukhi.ratplushies.repositories.OwnerRepository;
 import lol.khakikukhi.ratplushies.constants.UserRoles;
-import lol.khakikukhi.ratplushies.utilities.PasswordHasher;
+import lol.khakikukhi.ratplushies.utils.PasswordHasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
