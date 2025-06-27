@@ -1,10 +1,10 @@
-package lol.khakikukhi.ratplushies.services;
+package lol.khakikukhi.ratplushies.application.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import lol.khakikukhi.ratplushies.entities.Owner;
-import lol.khakikukhi.ratplushies.entities.Rat;
-import lol.khakikukhi.ratplushies.repositories.OwnerRepository;
-import lol.khakikukhi.ratplushies.repositories.RatRepository;
+import lol.khakikukhi.ratplushies.domain.entities.Owner;
+import lol.khakikukhi.ratplushies.domain.entities.Rat;
+import lol.khakikukhi.ratplushies.infrastructure.repositories.OwnerRepository;
+import lol.khakikukhi.ratplushies.infrastructure.repositories.RatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 

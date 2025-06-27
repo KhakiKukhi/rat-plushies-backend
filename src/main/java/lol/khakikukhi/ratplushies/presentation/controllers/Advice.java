@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.controllers;
+package lol.khakikukhi.ratplushies.presentation.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;

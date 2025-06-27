@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.configs;
+package lol.khakikukhi.ratplushies.infrastructure.configs;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

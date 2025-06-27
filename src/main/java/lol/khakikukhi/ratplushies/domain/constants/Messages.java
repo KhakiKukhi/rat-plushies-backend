@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.constants;
+package lol.khakikukhi.ratplushies.domain.constants;
 
 public class Messages {
 

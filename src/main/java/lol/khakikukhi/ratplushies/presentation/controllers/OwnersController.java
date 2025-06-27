@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.controllers;
+package lol.khakikukhi.ratplushies.presentation.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

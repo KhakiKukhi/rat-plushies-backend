@@ -1,7 +1,7 @@
-package lol.khakikukhi.ratplushies.controllers;
+package lol.khakikukhi.ratplushies.presentation.controllers;
 
 import jakarta.servlet.http.HttpSession;
-import lol.khakikukhi.ratplushies.services.ProfilePicturesService;
+import lol.khakikukhi.ratplushies.application.services.ProfilePicturesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

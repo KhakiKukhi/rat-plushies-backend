@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.configs;
+package lol.khakikukhi.ratplushies.infrastructure.configs;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

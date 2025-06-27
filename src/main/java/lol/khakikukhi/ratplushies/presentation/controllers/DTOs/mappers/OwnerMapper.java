@@ -1,7 +1,7 @@
-package lol.khakikukhi.ratplushies.DTOs.mappers;
+package lol.khakikukhi.ratplushies.presentation.controllers.DTOs.mappers;
 
-import lol.khakikukhi.ratplushies.DTOs.OwnerDto;
-import lol.khakikukhi.ratplushies.entities.Owner;
+import lol.khakikukhi.ratplushies.presentation.controllers.DTOs.OwnerDto;
+import lol.khakikukhi.ratplushies.domain.entities.Owner;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;

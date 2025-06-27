@@ -1,5 +1,7 @@
 package lol.khakikukhi.ratplushies.entities;
 
+import lol.khakikukhi.ratplushies.domain.entities.Owner;
+import lol.khakikukhi.ratplushies.domain.entities.Rat;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 

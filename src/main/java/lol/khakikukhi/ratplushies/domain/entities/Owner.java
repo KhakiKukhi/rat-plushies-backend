@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.entities;
+package lol.khakikukhi.ratplushies.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
