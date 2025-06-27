@@ -1,17 +1,20 @@
 package lol.khakikukhi.ratplushies.services;
 
 import jakarta.persistence.EntityNotFoundException;
-import lol.khakikukhi.ratplushies.entities.Owner;
-import lol.khakikukhi.ratplushies.entities.Rat;
-import lol.khakikukhi.ratplushies.repositories.OwnerRepository;
-import lol.khakikukhi.ratplushies.repositories.RatRepository;
+import lol.khakikukhi.ratplushies.application.services.ProfilePicturesService;
+import lol.khakikukhi.ratplushies.domain.entities.Owner;
+import lol.khakikukhi.ratplushies.domain.entities.Rat;
+import lol.khakikukhi.ratplushies.infrastructure.repositories.OwnerRepository;
+import lol.khakikukhi.ratplushies.infrastructure.repositories.RatRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.imageio.ImageIO;
@@ -22,8 +25,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 @Transactional
 class ProfilePicturesServiceIntegrationTest {
 
@@ -39,6 +46,9 @@ class ProfilePicturesServiceIntegrationTest {
     @TempDir
     static Path uploadDir;
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @DynamicPropertySource
     static void registerDynamicProps(DynamicPropertyRegistry registry) {
         registry.add("upload.dir", () -> uploadDir.toString());
@@ -47,7 +57,7 @@ class ProfilePicturesServiceIntegrationTest {
     }
 
     @Test
-    void uploadOwnerProfilePicture_happyPath() throws IOException {
+    void uploadOwnerProfilePicture_happyPath() throws Exception {
         // given
         Owner owner = new Owner();
         owner.setUsername("alice");
@@ -74,6 +84,12 @@ class ProfilePicturesServiceIntegrationTest {
         String expected = owner.getId() + ".png";
         assertEquals(expected, updated.getProfilePicture());
         assertTrue(Files.exists(Path.of(uploadDir.toString(), expected)));
+
+        mockMvc.perform(get("/uploads/" + expected))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("image/png")) // or whatever the mime type is
+                .andExpect(content().bytes(baos.toByteArray()));
+
     }
 
     @Test
@@ -251,4 +267,6 @@ class ProfilePicturesServiceIntegrationTest {
 
         return (int) Math.sqrt(dr * dr + dg * dg + db * db); // Euclidean RGB distance
     }
+
+
 }
