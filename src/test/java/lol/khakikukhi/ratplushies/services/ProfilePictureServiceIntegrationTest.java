@@ -1,11 +1,13 @@
 package lol.khakikukhi.ratplushies.services;
 
-import jakarta.persistence.EntityNotFoundException;
-import lol.khakikukhi.ratplushies.application.services.ProfilePicturesService;
+import lol.khakikukhi.ratplushies.application.services.entity.OwnerService;
+import lol.khakikukhi.ratplushies.application.services.entity.RatService;
+import lol.khakikukhi.ratplushies.application.services.entity.RatOwnershipService;
+import lol.khakikukhi.ratplushies.application.services.support.ProfilePictureService;
 import lol.khakikukhi.ratplushies.domain.entities.Owner;
 import lol.khakikukhi.ratplushies.domain.entities.Rat;
-import lol.khakikukhi.ratplushies.infrastructure.repositories.OwnerRepository;
-import lol.khakikukhi.ratplushies.infrastructure.repositories.RatRepository;
+import lol.khakikukhi.ratplushies.domain.entities.associations.RatOwnership;
+import lol.khakikukhi.ratplushies.utils.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,29 +27,36 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class ProfilePicturesServiceIntegrationTest {
+class ProfilePictureServiceIntegrationTest {
 
     @Autowired
-    private ProfilePicturesService service;
+    private ProfilePictureService service;
 
     @Autowired
-    private OwnerRepository ownerRepo;
+    private OwnerService ownerService;
 
     @Autowired
-    private RatRepository ratRepo;
+    private RatService ratService;
+
+    @Autowired
+    private RatOwnershipService ratOwnershipService;
 
     @TempDir
     static Path uploadDir;
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private TestUtils testUtils;
+
 
     @DynamicPropertySource
     static void registerDynamicProps(DynamicPropertyRegistry registry) {
@@ -59,10 +68,7 @@ class ProfilePicturesServiceIntegrationTest {
     @Test
     void uploadOwnerProfilePicture_happyPath() throws Exception {
         // given
-        Owner owner = new Owner();
-        owner.setUsername("alice");
-        owner.setPasswordHash("secret");
-        ownerRepo.save(owner);
+        Owner owner = testUtils.createOwner("alice");
 
         // build a tiny 10×10 PNG in memory
         BufferedImage img = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
@@ -80,7 +86,7 @@ class ProfilePicturesServiceIntegrationTest {
         service.uploadProfilePictureOwner(owner.getId(), file);
 
         // then
-        Owner updated = ownerRepo.findById(owner.getId()).orElseThrow();
+        Owner updated = ownerService.getOwnerById(owner.getId());
         String expected = owner.getId() + ".png";
         assertEquals(expected, updated.getProfilePicture());
         assertTrue(Files.exists(Path.of(uploadDir.toString(), expected)));
@@ -95,15 +101,12 @@ class ProfilePicturesServiceIntegrationTest {
     @Test
     void uploadRatProfilePicture_happyPath() throws IOException {
         // given
-        Rat rat = new Rat();
-        rat.setName("Remy");
-        ratRepo.save(rat);
+        Rat rat = testUtils.createRat("Remy");
 
-        Owner owner = new Owner();
-        owner.setUsername("bob");
-        owner.setPasswordHash("pw");
-        owner.addRat(rat);
-        ownerRepo.save(owner);
+        Owner owner = testUtils.createOwner("bob");
+
+        this.ratOwnershipService.saveOwnership(new RatOwnership(owner, rat));
+
 
         // generate a random hex colour
         int r = (int) (Math.random() * 256);
@@ -134,7 +137,7 @@ class ProfilePicturesServiceIntegrationTest {
         service.uploadProfilePictureRat(owner.getId(), rat.getId(), file);
 
         // then
-        Rat updated = ratRepo.findById(rat.getId()).orElseThrow();
+        Rat updated = ratService.getRatById(rat.getId());
         String expectedFilename = updated.getId() + ".jpg";
         Path savedPath = uploadDir.resolve(expectedFilename);
 
@@ -153,14 +156,9 @@ class ProfilePicturesServiceIntegrationTest {
     @Test
     void uploadRatProfilePicture_notOwner() throws IOException {
         // given
-        Rat rat = new Rat();
-        rat.setName("Remy");
-        ratRepo.save(rat);
+        Rat rat = testUtils.createRat("Remy");
 
-        Owner owner = new Owner();
-        owner.setUsername("bob");
-        owner.setPasswordHash("pw");
-        ownerRepo.save(owner);
+        Owner owner = testUtils.createOwner("bob");
 
         // generate a random hex colour
         int r = (int) (Math.random() * 256);
@@ -194,10 +192,7 @@ class ProfilePicturesServiceIntegrationTest {
 
     @Test
     void emptyFile_throwsIllegalArgument() {
-        Owner owner = new Owner();
-        owner.setUsername("bob");
-        owner.setPasswordHash("pw");
-        ownerRepo.save(owner);
+        Owner owner = testUtils.createOwner("charlie");
 
         var emptyFile = new MockMultipartFile("file", "empty.png", "image/png", new byte[0]);
         var ex = assertThrows(IllegalArgumentException.class,
@@ -208,10 +203,7 @@ class ProfilePicturesServiceIntegrationTest {
 
     @Test
     void invalidContentType_throwsIllegalArgument() {
-        Owner owner = new Owner();
-        owner.setUsername("charlie");
-        owner.setPasswordHash("pw");
-        ownerRepo.save(owner);
+        Owner owner = testUtils.createOwner("dan");
 
         var txtFile = new MockMultipartFile("file", "foo.txt", "text/plain", "hello".getBytes());
         assertThrows(IllegalArgumentException.class,
@@ -221,10 +213,7 @@ class ProfilePicturesServiceIntegrationTest {
 
     @Test
     void tooLargeImage_throwsIllegalArgument() throws IOException {
-        Owner owner = new Owner();
-        owner.setUsername("dan");
-        owner.setPasswordHash("pw");
-        ownerRepo.save(owner);
+        Owner owner = testUtils.createOwner("eve");
 
         // 2000×200 px image
         BufferedImage bigImg = new BufferedImage(2000, 200, BufferedImage.TYPE_INT_RGB);
@@ -246,8 +235,8 @@ class ProfilePicturesServiceIntegrationTest {
 
     @Test
     void nonExistentOwner_throwsEntityNotFound() {
-        var file = new MockMultipartFile("file", "pic.png", "image/png", new byte[]{1,2,3});
-        assertThrows(EntityNotFoundException.class,
+        var file = new MockMultipartFile("file", "pic.png", "image/png", new byte[]{1, 2, 3});
+        assertThrows(IllegalArgumentException.class,
                 () -> service.uploadProfilePictureOwner("USR_notreal", file)
         );
     }

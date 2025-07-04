@@ -1,7 +1,7 @@
 package lol.khakikukhi.ratplushies.presentation.controllers;
 
 import jakarta.servlet.http.HttpSession;
-import lol.khakikukhi.ratplushies.application.services.ProfilePicturesService;
+import lol.khakikukhi.ratplushies.application.services.support.ProfilePictureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +16,7 @@ import java.io.IOException;
 @RequestMapping("profile-pictures")
 public class ProfilePictureController {
 
-    private final ProfilePicturesService profilePicturesService;
+    private final ProfilePictureService profilePicturesService;
 
     @PostMapping(path = "/owners/{id}/upload-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadProfilePictureOwner (@PathVariable String id, @RequestParam("file")MultipartFile file) {

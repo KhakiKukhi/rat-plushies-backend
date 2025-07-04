@@ -1,4 +1,4 @@
-package lol.khakikukhi.ratplushies.presentation.controllers.DTOs;
+package lol.khakikukhi.ratplushies.transport.DTOs;
 
 import lombok.Data;
 
